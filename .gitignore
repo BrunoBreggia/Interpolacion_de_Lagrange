@@ -198,6 +198,7 @@ compile_commands.json
 *.fot
 *.cb
 *.cb2
+*.gz
 .*.lb
 
 ## Intermediate documents:
