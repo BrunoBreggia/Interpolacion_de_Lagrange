@@ -1,0 +1,170 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{color}
+
+\title{Interpolaci\'on de Lagrange Matricial}
+\author{Bruno M. Breggia}
+
+
+\begin{document}
+\maketitle
+
+Formas de representar un polinomio (de orden $n-1$):
+\begin{itemize}
+	\item \textbf{Serie de potencias}:
+	\begin{eqnarray*}
+	f(x) &=& a_{n-1}x^{n-1} + a_{n-2}x^{n-2} + ... + a_1 x + a_0\\
+	f(x) &=& \sum\limits_{i=0}^{n-1} a_i x^i
+	\end{eqnarray*}
+
+	\item \textbf{Forma factorizada}: donde $\{r_i\}$ son las $n-1$ ra\'ices del polinomio.
+	\begin{eqnarray*}
+	f(x) &=& (x-r_1)(x-r_2)...(x-r_{n-2})(x-r_{n-1})\\
+	f(x) &=& \prod_{i=1}^{n-1}(x-r_i)
+	\end{eqnarray*}
+	
+	\item \textbf{Forma de Lagrange}: donde $\{(x_i,y_i)\}$ son $n$ puntos que pertenecen al polinomio.
+	\begin{eqnarray*}
+	f(x) &=& \sum\limits_{i=0}^{n-1} y_i \prod_{\substack{j=0 \\ j\neq i}}^{n-1} \frac{x-x_j}{x_i-x_j}
+	\end{eqnarray*}
+\end{itemize}
+
+Un polinomio en forma de Lagrange se puede trabajar para obtener los coeficientes $\{a_i\}$ de serie de potencia. Trabajarlo como serie de potencias es de mayor comodidad a la hora de evaluar el polinomio para un valor de abscisas dado. Evaluar el polinomio con la forma de Lagrange es computacionalmente m\'as costoso por ser de complejidad $O(n^2)$.
+
+Partiremos para el caso en que tengamos 4 puntos, y por inducci\'on matem\'atica se podr\'a generalizar la f\'ormula para $n$ puntos cualesquiera.
+
+\section*{Lagrange con 4 puntos}
+
+T\'engase $n=4$ puntos con abscisas distintas:
+
+\begin{center}
+	\begin{tabular}{c|c}
+		$x$ & $y$ \\
+		\hline
+		$x_0$ & $y_0$ \\
+		$x_1$ & $y_1$ \\
+		$x_2$ & $y_2$ \\
+		$x_3$ & $y_3$
+	\end{tabular}
+\end{center}
+
+El polinomio de orden $3$ que interpola estos 4 puntos expresado en forma de Lagrange (expandido), es de la forma:
+
+\[ f(x) = \frac{(x-x_1)(x-x_2)(x-x_3)}{\color{blue}(x_0-x_1)(x_0-x_2)(x_0-x_3)} {\color{blue}y_0} + \frac{(x-x_0)(x-x_2)(x-x_3)}{\color{blue}(x_1-x_0)(x_1-x_2)(x_1-x_3)} {\color{blue}y_1} +\] \[ \frac{(x-x_0)(x-x_1)(x-x_3)}{\color{blue}(x_2-x_0)(x_2-x_1)(x_2-x_3)} {\color{blue}y_2} + \frac{(x-x_0)(x-x_1)(x-x_2)}{\color{blue}(x_3-x_0)(x_3-x_1)(x_3-x_2)} {\color{blue}y_3} \]
+
+Si rescatamos la parte que es constante en cada t\'ermino (en azul), podemos expresar este polinomio como el resultado de un producto punto de la forma:
+
+\[
+\begin{bmatrix}
+	\color{blue}
+    y_0/(x_0-x_1)(x_0-x_2)(x_0-x_3) \\
+    \color{blue}
+    y_1/(x_1-x_0)(x_1-x_2)(x_1-x_3) \\
+    \color{blue}
+    y_2/(x_2-x_0)(x_2-x_1)(x_2-x_3) \\
+    \color{blue}
+    y_3/(x_3-x_0)(x_3-x_1)(x_3-x_2)
+\end{bmatrix}
+\cdot 
+\begin{bmatrix}
+    (x-x_1)(x-x_2)(x-x_3) \\
+    (x-x_0)(x-x_2)(x-x_3) \\
+    (x-x_0)(x-x_1)(x-x_3) \\
+    (x-x_0)(x-x_1)(x-x_2)
+\end{bmatrix}
+\]
+
+El vector a la izquierda es una constante, y el de la derecha consiste en polinomios de grado $n-1$ en forma factorizada, y con el t\'ermino de mayor orden normalizado ($a_{n-1} = 1$). El vector constante en azul, que llamaremos $\vec{b}$, tiene componentes que siguen el siquiente patr\'on: \[ b_i = \frac{y_i}{\prod\limits_{\substack{j=0 \\ j\neq i}}^{n=1} (x_i-x_j)} \]
+
+El vector de polinomios, que llamaremos $\vec{\Gamma}(x)$, lo trabajamos por aparte. Desarrollamos cada componente de este vector en serie de potencia.
+
+\begin{eqnarray*}
+\vec{\Gamma}(x) &=& 
+\begin{bmatrix}
+    (x-x_1)(x-x_2)(x-x_3) \\
+    (x-x_0)(x-x_2)(x-x_3) \\
+    (x-x_0)(x-x_1)(x-x_3) \\
+    (x-x_0)(x-x_1)(x-x_2)
+\end{bmatrix}\\
+\vec{\Gamma}(x) &=&
+\begin{bmatrix}
+    {\color{red}x^3} - {\color{red}x^2}(x_1+x_2+x_3) + {\color{red}x}(x_1 x_2 + x_1 x_3 + x_2 x_3) - x_1 x_2 x_3\\
+    {\color{red}x^3} - {\color{red}x^2}(x_0+x_2+x_3) + {\color{red}x}(x_0 x_2 + x_0 x_3 + x_2 x_3) - x_0 x_2 x_3 \\
+    {\color{red}x^3} - {\color{red}x^2}(x_0+x_1+x_3) + {\color{red}x}(x_0 x_1 + x_0 x_3 + x_1 x_3) - x_0 x_1 x_3 \\
+    {\color{red}x^3} - {\color{red}x^2}(x_0+x_1+x_2) + {\color{red}x}(x_0 x_1 + x_0 x_2 + x_1 x_2) - x_0 x_1 x_2
+\end{bmatrix}
+\end{eqnarray*}
+
+A este vector lo podemos descomponer en un producto matricial entre una matriz $M$ de coeficientes, y un vector $\vec{x}$ de potencias de $x$.
+
+
+\begin{eqnarray*}
+\vec{\Gamma}(x) &=& 
+\begin{bmatrix}
+    1 & -(x_1+x_2+x_3) & x_1 x_2 + x_1 x_3 + x_2 x_3 & - x_1 x_2 x_3 \\
+    1 & -(x_0+x_2+x_3) & x_0 x_2 + x_0 x_3 + x_2 x_3 & - x_0 x_2 x_3 \\
+    1 & -(x_0+x_1+x_3) & x_0 x_1 + x_0 x_3 + x_1 x_3 & - x_0 x_1 x_3 \\
+    1 & -(x_0+x_1+x_2) & x_0 x_1 +  x_0 x_2 + x_1 x_2 & - x_0 x_1 x_2
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+\color{red} x^3\\
+\color{red} x^2\\
+\color{red} x\\
+\color{red} 1\\
+\end{bmatrix}
+\end{eqnarray*}
+
+Las filas de $M$ consisten en sumas de productos de los $\{x_k\}, k\neq i$, para $i$ el \'indice de fila. A su vez, t\'ipico del desarrollo en serie de potencias de un polinomio factorizado, tenemos que cada coeficiente es la suma de todas las \textit{combinaciones} de las ra\'ices agrupados de a $j \in [0,n-1]$, con $j$ el \'indice de columna. Adem\'as, columna de por medio, los valores est\'an multiplicados por $-1$.
+
+Los elementos de la matriz $M$ se expresan como:
+\[ m_{ij} = (-1)^j \sum_{\substack{A \in P(\{x_k\}-\{x_i\}) \\ |A|=j}} \left( \prod_{x_k\in A } x_k \right) \]
+
+Donde $P(\{x_k\})$ es el conjunto de todos los subconjuntos posibles del conjunto de ra\'ices $\{x_k\}$ del polinomio, y $|A|$ es el cardinal del conjunto $A$. N\'otese que la cantidad de conjuntos $A$ con cardinalidad $j$, para $j\in [0,n-1]$, es ${n-1 \choose j}$.\\
+
+Con estas matrices, es posible expresar la funci\'on interpolante de Lagrange como: $ f(x) = \vec{b}^T (M \vec{x}) $. Donde la \'unica operaci\'on utilizada es la operaci\'on matricial com\'un. Como el producto matricial es asociativo, se lo puede expresar como: $ f(x) = (\vec{b}^T M) \vec{x} $, en el cual el vector $\vec{k} = \vec{b}^T M$ es el vector de coeficientes $\{a_i\}$ de series de potencia de la funci\'on $f(x)$.\\
+
+\section*{Producto de tensores}
+Si consideramos todos los vectores y matrices hasta aqu\'i obtenidos como tensores dimensi\'on $n=4$, diremos que los vectores $\vec{b}, \vec{x}$ son tensores de orden 1, y la matriz $M$ es un tensor de orden 2.
+
+Dicho esto, el producto entre $\vec{b}$ y $M$ puede obtenerse mediante el producto di\'adico entre estos dos elementos, trabajado con notaci\'on indicial.
+
+\[
+\vec{b} = b_i \mathbf{e_i} \qquad M = m_{jk}\mathbf{e_j e_k}
+\]
+
+El producto de vectores $\vec{k} = \vec{b}^T M$ se traduce a un producto de tensores $\vec{k} = \vec{b} \cdot M$
+
+\begin{eqnarray*}
+\vec{k} &=& \vec{b} \cdot M\\
+\vec{k} &=& b_i \mathbf{e_i} \cdot m_{jk}\mathbf{e_j e_k}\\
+\vec{k} &=& b_i\ m_{jk}\ (\mathbf{e_i} \cdot \mathbf{e_j e_k})\\
+\vec{k} &=& b_i\ m_{jk}\ (\delta_{ij} \mathbf{e_k})\\
+\vec{k} &=& b_i\ m_{ik}\ \mathbf{e_k}
+\end{eqnarray*}
+
+De esta manera, tenemos que cada elemento del vector de coeficientes $\mathbf{k}$ se expresa, en forma desarrollada, como: \[ k_j = \sum\limits_{i=0}^{n-1} b_i\ m_{ij}\]
+
+Este resultado se puede obtener tambi\'en mediante el producto matricial com\'un entre $\vec{b}$ y $M$, con las correspondientes transposiciones.\\
+
+Con el vector de coeficientes $\vec{k}$, podemos expresar el polinomio en forma matricial como:
+\[ f(x) = \vec{k} \cdot 
+\begin{bmatrix}
+    x^{n-1}\\
+	...\\
+	x^2\\
+	x\\
+	1\\
+\end{bmatrix}
+\]
+
+
+
+
+
+
+
+\end{document}
